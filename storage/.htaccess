@@ -1,0 +1,4 @@
+# Deny ALL direct HTTP access to the storage directory.
+# Reports are served exclusively through a PHP download controller
+# (Phase 7) that verifies the requesting user owns the file.
+Require all denied

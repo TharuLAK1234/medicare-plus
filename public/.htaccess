@@ -1,0 +1,18 @@
+Options -Indexes
+RewriteEngine On
+
+# Security headers
+Header always set X-Content-Type-Options  "nosniff"
+Header always set X-Frame-Options         "DENY"
+Header always set X-XSS-Protection        "1; mode=block"
+Header always set Referrer-Policy         "strict-origin-when-cross-origin"
+
+# Block direct access to sensitive directories
+RewriteRule ^(config|core|models|controllers|storage|database)(/.*)?$ - [F,L]
+
+# Let real files and directories pass through unchanged
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route everything else to the front controller
+RewriteRule ^(.*)$ index.php [QSA,L]
