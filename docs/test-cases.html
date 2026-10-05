@@ -1,0 +1,1146 @@
+<title>MediCare Plus Test Cases</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap">
+
+<style>
+/* ── Tokens ───────────────────────────────────────────────── */
+:root {
+  --bg:        #F7FAFB;
+  --surface:   #FFFFFF;
+  --surface-2: #F0F4F6;
+  --border:    #D8E3E8;
+  --border-2:  #EBF2F5;
+  --text-1:    #0F2333;
+  --text-2:    #3D5A6B;
+  --text-3:    #7A96A5;
+  --brand:     #0A6E82;
+  --brand-lt:  #E4F3F7;
+  --pass:      #059669;
+  --pass-lt:   #ECFDF5;
+  --fail:      #DC2626;
+  --fail-lt:   #FEF2F2;
+  --warn:      #D97706;
+  --warn-lt:   #FFFBEB;
+  --mono-bg:   #EDF3F5;
+  --accent:    #0A6E82;
+  --f-display: 'IBM Plex Sans', system-ui, sans-serif;
+  --f-body:    'Inter', system-ui, sans-serif;
+  --f-mono:    'IBM Plex Mono', 'Courier New', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:        #0C1A22;
+    --surface:   #132230;
+    --surface-2: #1A2E3D;
+    --border:    #1E3547;
+    --border-2:  #182C3A;
+    --text-1:    #E8F2F6;
+    --text-2:    #8DAFC0;
+    --text-3:    #4D7080;
+    --brand:     #2FA0BA;
+    --brand-lt:  #0D2D38;
+    --pass:      #34D399;
+    --pass-lt:   #0A2820;
+    --fail:      #F87171;
+    --fail-lt:   #2D1212;
+    --warn:      #FBBF24;
+    --warn-lt:   #2D2008;
+    --mono-bg:   #162433;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:        #0C1A22;
+  --surface:   #132230;
+  --surface-2: #1A2E3D;
+  --border:    #1E3547;
+  --border-2:  #182C3A;
+  --text-1:    #E8F2F6;
+  --text-2:    #8DAFC0;
+  --text-3:    #4D7080;
+  --brand:     #2FA0BA;
+  --brand-lt:  #0D2D38;
+  --pass:      #34D399;
+  --pass-lt:   #0A2820;
+  --fail:      #F87171;
+  --fail-lt:   #2D1212;
+  --warn:      #FBBF24;
+  --warn-lt:   #2D2008;
+  --mono-bg:   #162433;
+}
+
+/* ── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--f-body);
+  background: var(--bg);
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: 1.6;
+  padding-inline: 0;
+  padding-block: 0;
+}
+
+/* ── Layout shell ─────────────────────────────────────────── */
+.shell {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+}
+.topbar {
+  grid-column: 1 / -1;
+  background: var(--brand);
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -.01em;
+  color: #fff;
+}
+.topbar-logo svg { flex-shrink: 0; }
+.topbar-meta {
+  font-size: .75rem;
+  color: rgba(255,255,255,.7);
+  text-align: right;
+  line-height: 1.5;
+}
+.topbar-meta strong { color: rgba(255,255,255,.95); font-weight: 600; }
+
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 1.5rem 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  font-family: var(--f-display);
+}
+.sidebar-label {
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0 1.25rem .5rem;
+  margin-top: 1rem;
+}
+.sidebar-label:first-child { margin-top: 0; }
+.sidebar a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .45rem 1.25rem;
+  font-size: .8rem;
+  font-weight: 500;
+  color: var(--text-2);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all .12s;
+}
+.sidebar a:hover,
+.sidebar a.active {
+  background: var(--brand-lt);
+  color: var(--brand);
+  border-left-color: var(--brand);
+}
+.sidebar a .cnt {
+  font-family: var(--f-mono);
+  font-size: .7rem;
+  background: var(--surface-2);
+  color: var(--text-3);
+  padding: .1rem .4rem;
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+.main {
+  padding: 2rem;
+  max-width: 960px;
+}
+
+/* ── Summary bar ──────────────────────────────────────────── */
+.summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  margin-bottom: 2rem;
+}
+.summary-chip {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .6rem 1rem;
+  font-family: var(--f-display);
+}
+.summary-chip .num {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-1);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.summary-chip .lbl {
+  font-size: .72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text-3);
+  line-height: 1.3;
+}
+.summary-chip.pass .num { color: var(--pass); }
+.summary-chip.fail .num { color: var(--fail); }
+.summary-chip.warn .num { color: var(--warn); }
+
+/* ── Section ──────────────────────────────────────────────── */
+.section {
+  margin-bottom: 2.5rem;
+  scroll-margin-top: 1rem;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: 1rem;
+  padding-bottom: .6rem;
+  border-bottom: 1px solid var(--border);
+}
+.section-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--brand-lt);
+  color: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.section-title {
+  font-family: var(--f-display);
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--text-1);
+  text-wrap: balance;
+}
+.section-count {
+  font-family: var(--f-mono);
+  font-size: .7rem;
+  background: var(--mono-bg);
+  color: var(--text-3);
+  padding: .15rem .5rem;
+  border-radius: 4px;
+  margin-left: auto;
+}
+
+/* ── Test case table ──────────────────────────────────────── */
+.tc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .8rem;
+}
+.tc-table thead th {
+  font-family: var(--f-display);
+  font-size: .65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-3);
+  background: var(--surface-2);
+  padding: .55rem .875rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.tc-table thead th:first-child { border-radius: 8px 0 0 0; }
+.tc-table thead th:last-child  { border-radius: 0 8px 0 0; }
+
+.tc-table tbody tr {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-2);
+  transition: background .1s;
+}
+.tc-table tbody tr:last-child { border-bottom: 1px solid var(--border); }
+.tc-table tbody tr:hover { background: var(--surface-2); }
+.tc-table td {
+  padding: .7rem .875rem;
+  vertical-align: top;
+  color: var(--text-2);
+}
+.tc-table td.id-col {
+  font-family: var(--f-mono);
+  font-size: .72rem;
+  font-weight: 500;
+  color: var(--brand);
+  white-space: nowrap;
+  width: 70px;
+}
+.tc-table td.name-col {
+  font-family: var(--f-display);
+  font-weight: 600;
+  color: var(--text-1);
+  font-size: .82rem;
+  min-width: 160px;
+}
+.tc-table td.steps-col {
+  font-size: .78rem;
+  line-height: 1.55;
+  max-width: 240px;
+}
+.tc-table td.expect-col {
+  font-size: .78rem;
+  line-height: 1.55;
+  max-width: 200px;
+}
+.tc-table td.status-col {
+  text-align: center;
+  width: 70px;
+}
+
+ol.steps { padding-left: 1.1rem; }
+ol.steps li { margin-bottom: .15rem; }
+
+.badge-pass {
+  display: inline-block;
+  background: var(--pass-lt);
+  color: var(--pass);
+  font-family: var(--f-display);
+  font-size: .65rem;
+  font-weight: 700;
+  padding: .2rem .55rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.badge-pending {
+  display: inline-block;
+  background: var(--warn-lt);
+  color: var(--warn);
+  font-family: var(--f-display);
+  font-size: .65rem;
+  font-weight: 700;
+  padding: .2rem .55rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+code {
+  font-family: var(--f-mono);
+  font-size: .75em;
+  background: var(--mono-bg);
+  color: var(--brand);
+  padding: .1rem .35rem;
+  border-radius: 4px;
+}
+
+/* ── Precondition tag ─────────────────────────────────────── */
+.pre {
+  font-size: .7rem;
+  color: var(--text-3);
+  margin-bottom: .3rem;
+  font-style: italic;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr;
+  }
+  .sidebar {
+    position: static;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: .75rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0;
+  }
+  .sidebar-label { display: none; }
+  .sidebar a {
+    padding: .4rem .75rem;
+    font-size: .75rem;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+  }
+  .sidebar a:hover,
+  .sidebar a.active {
+    border-left-color: transparent;
+    border-bottom-color: var(--brand);
+  }
+  .main { padding: 1rem; }
+  .topbar { flex-direction: column; align-items: flex-start; gap: .25rem; }
+  .topbar-meta { text-align: left; }
+  .tc-table td.steps-col,
+  .tc-table td.expect-col { max-width: 120px; }
+}
+
+@media (max-width: 480px) {
+  .tc-table { font-size: .72rem; }
+  .tc-table td { padding: .5rem .5rem; }
+  .tc-table td.steps-col,
+  .tc-table td.expect-col { display: none; }
+}
+</style>
+
+<div class="shell">
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="topbar-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="6" fill="rgba(255,255,255,.15)"/>
+        <path d="M14 7v14M7 14h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      MediCare Plus — Test Case Register
+    </div>
+    <div class="topbar-meta">
+      <strong>Module CSE5009</strong> — Web Application Development<br>
+      ICBT Campus &nbsp;·&nbsp; 41 test cases &nbsp;·&nbsp; PHP / MySQL / Bootstrap 5
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-label">Test Categories</div>
+    <a href="#auth">Authentication <span class="cnt">8</span></a>
+    <a href="#booking">Booking Flow <span class="cnt">6</span></a>
+    <a href="#appointments">Appointments <span class="cnt">5</span></a>
+    <a href="#ratings">Ratings <span class="cnt">3</span></a>
+    <a href="#reports">Reports <span class="cnt">5</span></a>
+    <a href="#messaging">Messaging <span class="cnt">4</span></a>
+    <a href="#security">Security <span class="cnt">6</span></a>
+    <a href="#ui">UI &amp; Navigation <span class="cnt">4</span></a>
+    <div class="sidebar-label">Summary</div>
+    <a href="#summary">Result Overview <span class="cnt">41</span></a>
+  </nav>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Summary bar -->
+    <div class="summary-row" id="summary">
+      <div class="summary-chip">
+        <div>
+          <div class="num">41</div>
+          <div class="lbl">Total Cases</div>
+        </div>
+      </div>
+      <div class="summary-chip pass">
+        <div>
+          <div class="num">41</div>
+          <div class="lbl">Passed</div>
+        </div>
+      </div>
+      <div class="summary-chip fail">
+        <div>
+          <div class="num">0</div>
+          <div class="lbl">Failed</div>
+        </div>
+      </div>
+      <div class="summary-chip warn">
+        <div>
+          <div class="num">0</div>
+          <div class="lbl">Pending</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TC-AUTH ─────────────────────────────────────────── -->
+    <section class="section" id="auth">
+      <div class="section-header">
+        <div class="section-icon">🔐</div>
+        <div class="section-title">Authentication</div>
+        <div class="section-count">TC-AUTH-001 → 008</div>
+      </div>
+      <table class="tc-table">
+        <thead>
+          <tr>
+            <th>ID</th><th>Test Name</th><th>Steps</th><th>Expected Result</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="id-col">AUTH-001</td>
+            <td class="name-col">Patient registration — valid data</td>
+            <td class="steps-col">
+              <div class="pre">Guest, not logged in</div>
+              <ol class="steps">
+                <li>Navigate to <code>/register</code></li>
+                <li>Fill all required fields with valid data</li>
+                <li>Submit form</li>
+              </ol>
+            </td>
+            <td class="expect-col">User and patient records created; session established; redirected to <code>/patient/dashboard</code> with success flash</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">AUTH-002</td>
+            <td class="name-col">Registration — duplicate email</td>
+            <td class="steps-col">
+              <div class="pre">Email already exists in DB</div>
+              <ol class="steps">
+                <li>Submit registration with existing email</li>
+              </ol>
+            </td>
+            <td class="expect-col">Validator returns "unique" error; form re-rendered with error message; no duplicate record created</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">AUTH-003</td>
+            <td class="name-col">Registration — password too short</td>
+            <td class="steps-col">
+              <div class="pre">Guest on /register</div>
+              <ol class="steps">
+                <li>Enter password with 6 characters</li>
+                <li>Submit form</li>
+              </ol>
+            </td>
+            <td class="expect-col">Validator fails <code>min:8</code> rule; error shown below password field; no record created</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">AUTH-004</td>
+            <td class="name-col">Patient login — correct credentials</td>
+            <td class="steps-col">
+              <div class="pre">Active patient account exists</div>
+              <ol class="steps">
+                <li>Navigate to <code>/login</code></li>
+                <li>Enter correct email and password</li>
+                <li>Submit</li>
+              </ol>
+            </td>
+            <td class="expect-col">Session created with role=patient; redirected to <code>/patient/dashboard</code>; welcome flash shown</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">AUTH-005</td>
+            <td class="name-col">Patient login — wrong password</td>
+            <td class="steps-col">
+              <div class="pre">Active patient account exists</div>
+              <ol class="steps">
+                <li>Enter correct email, wrong password</li>
+                <li>Submit</li>
+              </ol>
+            </td>
+            <td class="expect-col">"Invalid email or password" error shown; failure counter incremented in session; no session created</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">AUTH-006</td>
+            <td class="name-col">Login rate limit — lockout after 5 failures</td>
+            <td class="steps-col">
+              <div class="pre">Active account, 4 prior failures in session</div>
+              <ol class="steps">
+                <li>Submit incorrect password a 5th time</li>
+                <li>Attempt login again immediately</li>
+              </ol>
+            </td>
+            <td class="expect-col">Lockout message shown for 15 minutes; subsequent attempts blocked without calling <code>Auth::attempt()</code></td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">AUTH-007</td>
+            <td class="name-col">Wrong portal — doctor using patient login</td>
+            <td class="steps-col">
+              <div class="pre">Active doctor account</div>
+              <ol class="steps">
+                <li>Navigate to <code>/login</code> (patient portal)</li>
+                <li>Enter doctor credentials</li>
+                <li>Submit</li>
+              </ol>
+            </td>
+            <td class="expect-col">"wrong_portal" status returned; "not registered for the Patient Portal" error shown; no session created</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">AUTH-008</td>
+            <td class="name-col">Admin portal login</td>
+            <td class="steps-col">
+              <div class="pre">Active admin account</div>
+              <ol class="steps">
+                <li>Navigate to <code>/admin/login</code></li>
+                <li>Enter admin credentials</li>
+                <li>Submit</li>
+              </ol>
+            </td>
+            <td class="expect-col">Session created with role=admin; redirected to <code>/admin/dashboard</code>; "Signed in as administrator" flash</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ── TC-BOOKING ──────────────────────────────────────── -->
+    <section class="section" id="booking">
+      <div class="section-header">
+        <div class="section-icon">📅</div>
+        <div class="section-title">Booking Flow</div>
+        <div class="section-count">TC-BOOK-001 → 006</div>
+      </div>
+      <table class="tc-table">
+        <thead>
+          <tr><th>ID</th><th>Test Name</th><th>Steps</th><th>Expected Result</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="id-col">BOOK-001</td>
+            <td class="name-col">Guest tries to book appointment</td>
+            <td class="steps-col">
+              <div class="pre">Not logged in</div>
+              <ol class="steps">
+                <li>Navigate to doctor profile</li>
+                <li>Observe booking widget</li>
+              </ol>
+            </td>
+            <td class="expect-col">Booking widget shows "Sign in to book" message instead of date/time form; no booking form rendered</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">BOOK-002</td>
+            <td class="name-col">AJAX slot loading on date change</td>
+            <td class="steps-col">
+              <div class="pre">Logged-in patient, doctor with availability</div>
+              <ol class="steps">
+                <li>Open doctor profile</li>
+                <li>Select a date in the date picker</li>
+              </ol>
+            </td>
+            <td class="expect-col"><code>/booking/slots</code> called via fetch; time slot <code>&lt;select&gt;</code> populated with available 30-min slots; already-booked slots excluded</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">BOOK-003</td>
+            <td class="name-col">Successful appointment booking</td>
+            <td class="steps-col">
+              <div class="pre">Patient logged in, slot available</div>
+              <ol class="steps">
+                <li>Select date and available time</li>
+                <li>Enter reason</li>
+                <li>Submit booking confirmation</li>
+              </ol>
+            </td>
+            <td class="expect-col">Appointment row inserted with status=pending and unique <code>ref_no</code> (MP-XXXXXXXX); redirected to success page showing ref, date, time, fee</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">BOOK-004</td>
+            <td class="name-col">Double-booking prevention</td>
+            <td class="steps-col">
+              <div class="pre">Slot already booked (pending or confirmed)</div>
+              <ol class="steps">
+                <li>Attempt to book the same doctor/date/time as existing appointment</li>
+              </ol>
+            </td>
+            <td class="expect-col">PHP guard detects conflict; booking rejected with error flash; no duplicate row inserted; DB UNIQUE KEY on (doctor_id, appt_date, appt_time) as second guard</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">BOOK-005</td>
+            <td class="name-col">Booking confirmation page displays correct data</td>
+            <td class="steps-col">
+              <div class="pre">POST /booking/create with valid data</div>
+              <ol class="steps">
+                <li>Complete booking form</li>
+                <li>View confirmation page before final submit</li>
+              </ol>
+            </td>
+            <td class="expect-col">Doctor name, specialisation, date, time, reason and fee all displayed correctly before final POST to <code>/booking/store</code></td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">BOOK-006</td>
+            <td class="name-col">Doctor role cannot use booking widget</td>
+            <td class="steps-col">
+              <div class="pre">Logged in as doctor</div>
+              <ol class="steps">
+                <li>View any doctor profile page</li>
+              </ol>
+            </td>
+            <td class="expect-col">Booking widget replaced with "Doctor accounts cannot book appointments" notice</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ── TC-APPT ─────────────────────────────────────────── -->
+    <section class="section" id="appointments">
+      <div class="section-header">
+        <div class="section-icon">🩺</div>
+        <div class="section-title">Appointment Management</div>
+        <div class="section-count">TC-APPT-001 → 005</div>
+      </div>
+      <table class="tc-table">
+        <thead>
+          <tr><th>ID</th><th>Test Name</th><th>Steps</th><th>Expected Result</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="id-col">APPT-001</td>
+            <td class="name-col">Patient cancels pending appointment</td>
+            <td class="steps-col">
+              <div class="pre">Patient has a pending appointment</div>
+              <ol class="steps">
+                <li>Navigate to <code>/appointments</code></li>
+                <li>Click Cancel on a pending row</li>
+                <li>Confirm the prompt</li>
+              </ol>
+            </td>
+            <td class="expect-col">Appointment status updated to cancelled; success flash shown; row moves to Cancelled tab on reload</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">APPT-002</td>
+            <td class="name-col">Patient cannot cancel another patient's appointment</td>
+            <td class="steps-col">
+              <div class="pre">Two patient accounts with separate appointments</div>
+              <ol class="steps">
+                <li>Patient A submits cancel form with Patient B's appointment ID</li>
+              </ol>
+            </td>
+            <td class="expect-col">Ownership check fails (patient_user_id ≠ Auth::id()); 403 or redirect with error; appointment unchanged</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">APPT-003</td>
+            <td class="name-col">Doctor confirms pending appointment</td>
+            <td class="steps-col">
+              <div class="pre">Doctor has a pending appointment in queue</div>
+              <ol class="steps">
+                <li>Navigate to <code>/doctor/appointments</code></li>
+                <li>Click Confirm on a pending row</li>
+              </ol>
+            </td>
+            <td class="expect-col">Status updated to confirmed; row moves to Confirmed tab; doctor ownership verified via doctors.user_id join</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">APPT-004</td>
+            <td class="name-col">Doctor completes appointment with notes</td>
+            <td class="steps-col">
+              <div class="pre">Confirmed appointment exists</div>
+              <ol class="steps">
+                <li>Open complete modal for a confirmed appointment</li>
+                <li>Enter consultation notes</li>
+                <li>Submit</li>
+              </ol>
+            </td>
+            <td class="expect-col">Status updated to completed; notes saved; Rate button appears on patient's appointment view for this appointment</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">APPT-005</td>
+            <td class="name-col">Admin views all appointments with status filter</td>
+            <td class="steps-col">
+              <div class="pre">Multiple appointments with varying statuses</div>
+              <ol class="steps">
+                <li>Log in as admin</li>
+                <li>Navigate to <code>/admin/appointments</code></li>
+                <li>Click each filter chip (Pending, Confirmed, etc.)</li>
+              </ol>
+            </td>
+            <td class="expect-col">Each filter chip shows only appointments matching that status; All chip shows complete list; row counts match DB records</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ── TC-RATE ─────────────────────────────────────────── -->
+    <section class="section" id="ratings">
+      <div class="section-header">
+        <div class="section-icon">⭐</div>
+        <div class="section-title">Ratings</div>
+        <div class="section-count">TC-RATE-001 → 003</div>
+      </div>
+      <table class="tc-table">
+        <thead>
+          <tr><th>ID</th><th>Test Name</th><th>Steps</th><th>Expected Result</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="id-col">RATE-001</td>
+            <td class="name-col">Patient rates completed appointment</td>
+            <td class="steps-col">
+              <div class="pre">Completed appointment, unrated</div>
+              <ol class="steps">
+                <li>Click Rate button on completed appointment</li>
+                <li>Click a star (e.g. 4 stars)</li>
+                <li>Enter review text and submit</li>
+              </ol>
+            </td>
+            <td class="expect-col">Rating row inserted; doctor's avg_rating recalculated; Rate button replaced with "Rated" indicator; stars visible on doctor profile</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">RATE-002</td>
+            <td class="name-col">Duplicate rating blocked</td>
+            <td class="steps-col">
+              <div class="pre">Appointment already rated</div>
+              <ol class="steps">
+                <li>Navigate directly to <code>/appointments/:id/rate</code> for a rated appointment</li>
+              </ol>
+            </td>
+            <td class="expect-col">Controller detects existing rating; redirect with "already rated" flash; UNIQUE KEY (appointment_id) on ratings table as DB-level guard</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">RATE-003</td>
+            <td class="name-col">Patient cannot rate another patient's appointment</td>
+            <td class="steps-col">
+              <div class="pre">Patient A logged in; appointment belongs to Patient B</div>
+              <ol class="steps">
+                <li>Navigate to <code>/appointments/:id/rate</code> using Patient B's appointment ID</li>
+              </ol>
+            </td>
+            <td class="expect-col">Ownership check: <code>patient_user_id ≠ Auth::id()</code>; redirected with 403 / access denied; no rating created</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ── TC-REPORT ───────────────────────────────────────── -->
+    <section class="section" id="reports">
+      <div class="section-header">
+        <div class="section-icon">📋</div>
+        <div class="section-title">Reports</div>
+        <div class="section-count">TC-RPT-001 → 005</div>
+      </div>
+      <table class="tc-table">
+        <thead>
+          <tr><th>ID</th><th>Test Name</th><th>Steps</th><th>Expected Result</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="id-col">RPT-001</td>
+            <td class="name-col">Doctor uploads valid PDF report</td>
+            <td class="steps-col">
+              <div class="pre">Doctor logged in, patient exists</div>
+              <ol class="steps">
+                <li>Open Upload modal on <code>/doctor/reports</code></li>
+                <li>Select patient, enter title, choose type</li>
+                <li>Attach a PDF (&lt; 10 MB)</li>
+                <li>Submit</li>
+              </ol>
+            </td>
+            <td class="expect-col">File moved to <code>storage/reports/</code> (outside webroot); report row inserted in DB; report appears in doctor's table and patient's reports page</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">RPT-002</td>
+            <td class="name-col">Upload rejected — file exceeds 10 MB</td>
+            <td class="steps-col">
+              <div class="pre">Doctor upload form</div>
+              <ol class="steps">
+                <li>Attach a file larger than 10 MB</li>
+                <li>Submit</li>
+              </ol>
+            </td>
+            <td class="expect-col">ReportController::MAX_SIZE check fails; error flash shown; no file saved; no DB record created</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">RPT-003</td>
+            <td class="name-col">Upload rejected — disallowed MIME type</td>
+            <td class="steps-col">
+              <div class="pre">Doctor upload form</div>
+              <ol class="steps">
+                <li>Rename an executable as <code>report.pdf</code></li>
+                <li>Attempt to upload it</li>
+              </ol>
+            </td>
+            <td class="expect-col"><code>finfo</code> inspects file magic bytes; MIME not in allowed list; upload rejected regardless of filename extension</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">RPT-004</td>
+            <td class="name-col">Patient downloads own report</td>
+            <td class="steps-col">
+              <div class="pre">Report uploaded for this patient</div>
+              <ol class="steps">
+                <li>Navigate to <code>/reports</code></li>
+                <li>Click Download on a report row</li>
+              </ol>
+            </td>
+            <td class="expect-col">Ownership verified; PHP serves file via <code>readfile()</code> with correct <code>Content-Disposition</code> and <code>Content-Type</code> headers; file not publicly accessible via direct URL</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">RPT-005</td>
+            <td class="name-col">Patient cannot download another patient's report</td>
+            <td class="steps-col">
+              <div class="pre">Report belongs to Patient B</div>
+              <ol class="steps">
+                <li>Patient A navigates to <code>/reports/download/:id</code> using Patient B's report ID</li>
+              </ol>
+            </td>
+            <td class="expect-col">Ownership check: report's <code>patient_id ≠ Auth::id()</code>; 403 rendered; no file served</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ── TC-MSG ──────────────────────────────────────────── -->
+    <section class="section" id="messaging">
+      <div class="section-header">
+        <div class="section-icon">💬</div>
+        <div class="section-title">Messaging</div>
+        <div class="section-count">TC-MSG-001 → 004</div>
+      </div>
+      <table class="tc-table">
+        <thead>
+          <tr><th>ID</th><th>Test Name</th><th>Steps</th><th>Expected Result</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="id-col">MSG-001</td>
+            <td class="name-col">Patient creates new message thread</td>
+            <td class="steps-col">
+              <div class="pre">Patient logged in, at least one doctor exists</div>
+              <ol class="steps">
+                <li>Open <code>/messages</code></li>
+                <li>Click New Message</li>
+                <li>Select doctor, enter subject and body</li>
+                <li>Submit</li>
+              </ol>
+            </td>
+            <td class="expect-col">Thread row inserted; first message saved; thread appears in both patient and doctor thread lists; doctor sees unread badge</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">MSG-002</td>
+            <td class="name-col">Unread count decrements on thread open</td>
+            <td class="steps-col">
+              <div class="pre">Doctor has an unread message from patient</div>
+              <ol class="steps">
+                <li>Doctor navigates to <code>/messages/:id</code></li>
+              </ol>
+            </td>
+            <td class="expect-col"><code>Message::markRead()</code> updates <code>is_read=1</code> for messages sent by the other party; navbar unread badge count decreases</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">MSG-003</td>
+            <td class="name-col">Doctor replies to patient thread</td>
+            <td class="steps-col">
+              <div class="pre">Active thread between patient and doctor</div>
+              <ol class="steps">
+                <li>Doctor opens thread</li>
+                <li>Types reply and submits</li>
+              </ol>
+            </td>
+            <td class="expect-col">Message appended to thread; bubble appears on right side (doctor's view); patient sees it on left side; patient unread count incremented</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">MSG-004</td>
+            <td class="name-col">Ownership check on thread access</td>
+            <td class="steps-col">
+              <div class="pre">Thread exists between Patient A and Doctor</div>
+              <ol class="steps">
+                <li>Patient B navigates to <code>/messages/:id</code> for that thread</li>
+              </ol>
+            </td>
+            <td class="expect-col">Controller verifies user is participant (patient_id or doctor user_id); access denied with redirect; thread content not exposed</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ── TC-SEC ──────────────────────────────────────────── -->
+    <section class="section" id="security">
+      <div class="section-header">
+        <div class="section-icon">🛡️</div>
+        <div class="section-title">Security</div>
+        <div class="section-count">TC-SEC-001 → 006</div>
+      </div>
+      <table class="tc-table">
+        <thead>
+          <tr><th>ID</th><th>Test Name</th><th>Steps</th><th>Expected Result</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="id-col">SEC-001</td>
+            <td class="name-col">CSRF token validation</td>
+            <td class="steps-col">
+              <div class="pre">Valid user session</div>
+              <ol class="steps">
+                <li>Craft a POST request to <code>/appointment/cancel</code> with a forged or missing CSRF token</li>
+              </ol>
+            </td>
+            <td class="expect-col"><code>CSRF::verifyOrFail()</code> detects token mismatch; request rejected with 403; no data mutated</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">SEC-002</td>
+            <td class="name-col">XSS — stored name output</td>
+            <td class="steps-col">
+              <div class="pre">Attacker creates account</div>
+              <ol class="steps">
+                <li>Register with name: <code>&lt;script&gt;alert(1)&lt;/script&gt;</code></li>
+                <li>View any page that renders the name</li>
+              </ol>
+            </td>
+            <td class="expect-col">All output passes through <code>e()</code> (<code>htmlspecialchars</code>); rendered as literal text, not executed; no alert fires</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">SEC-003</td>
+            <td class="name-col">SQL injection — login email field</td>
+            <td class="steps-col">
+              <div class="pre">Guest on /login</div>
+              <ol class="steps">
+                <li>Enter <code>' OR '1'='1</code> as email</li>
+                <li>Submit</li>
+              </ol>
+            </td>
+            <td class="expect-col">PDO prepared statements used throughout; input treated as literal value; login fails normally; no DB error or unauthorised access</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">SEC-004</td>
+            <td class="name-col">Direct file access to storage/reports/</td>
+            <td class="steps-col">
+              <div class="pre">A report file exists on disk</div>
+              <ol class="steps">
+                <li>Construct the storage path URL directly in the browser</li>
+              </ol>
+            </td>
+            <td class="expect-col"><code>storage/</code> is outside <code>public/</code> webroot; Apache returns 404; file only accessible through <code>/reports/download/:id</code> with auth</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">SEC-005</td>
+            <td class="name-col">Unauthenticated access to protected route</td>
+            <td class="steps-col">
+              <div class="pre">Not logged in</div>
+              <ol class="steps">
+                <li>Navigate directly to <code>/patient/dashboard</code></li>
+              </ol>
+            </td>
+            <td class="expect-col"><code>Middleware::requireRole('patient')</code> detects no session; redirects to <code>/login</code> with warning flash; dashboard not rendered</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">SEC-006</td>
+            <td class="name-col">HTTP security headers present</td>
+            <td class="steps-col">
+              <div class="pre">Any page load</div>
+              <ol class="steps">
+                <li>Inspect response headers using browser DevTools</li>
+              </ol>
+            </td>
+            <td class="expect-col"><code>X-Frame-Options: SAMEORIGIN</code>, <code>X-Content-Type-Options: nosniff</code>, <code>Referrer-Policy: strict-origin-when-cross-origin</code>, <code>X-XSS-Protection: 1; mode=block</code> all present</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ── TC-UI ───────────────────────────────────────────── -->
+    <section class="section" id="ui">
+      <div class="section-header">
+        <div class="section-icon">🖥️</div>
+        <div class="section-title">UI &amp; Navigation</div>
+        <div class="section-count">TC-UI-001 → 004</div>
+      </div>
+      <table class="tc-table">
+        <thead>
+          <tr><th>ID</th><th>Test Name</th><th>Steps</th><th>Expected Result</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="id-col">UI-001</td>
+            <td class="name-col">404 page renders with full app layout</td>
+            <td class="steps-col">
+              <ol class="steps">
+                <li>Navigate to any non-existent route, e.g. <code>/doesnotexist</code></li>
+              </ol>
+            </td>
+            <td class="expect-col">Full navbar and footer rendered; 404 illustration shown; "Go Home" link returns to <code>/</code>; HTTP status code is 404; page is on-brand</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">UI-002</td>
+            <td class="name-col">Mobile — navbar collapses to hamburger</td>
+            <td class="steps-col">
+              <div class="pre">Viewport ≤ 991px</div>
+              <ol class="steps">
+                <li>Open any page on a mobile device or narrow viewport</li>
+                <li>Tap the hamburger icon</li>
+              </ol>
+            </td>
+            <td class="expect-col">Nav links hidden by default; hamburger visible; tapping it reveals the full link list; layout does not overflow horizontally</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">UI-003</td>
+            <td class="name-col">Unread message badge updates</td>
+            <td class="steps-col">
+              <div class="pre">Patient with unread messages</div>
+              <ol class="steps">
+                <li>Load any patient page</li>
+                <li>Check the Messages link in the navbar</li>
+              </ol>
+            </td>
+            <td class="expect-col">Red numeric badge visible on Messages nav link; count matches <code>Message::unreadCount()</code>; badge disappears after all threads are read</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="id-col">UI-004</td>
+            <td class="name-col">Flash messages display and dismiss</td>
+            <td class="steps-col">
+              <div class="pre">Any action that triggers a flash (e.g. login)</div>
+              <ol class="steps">
+                <li>Complete a successful login</li>
+                <li>Click the × on the flash banner</li>
+              </ol>
+            </td>
+            <td class="expect-col">Coloured flash banner renders below navbar with success icon and text; clicking × dismisses it via Bootstrap alert dismiss; flash is single-use (not shown again on reload)</td>
+            <td class="status-col"><span class="badge-pass">Pass</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// Sidebar active link on scroll
+const sections = document.querySelectorAll('.section');
+const links = document.querySelectorAll('.sidebar a[href^="#"]');
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`.sidebar a[href="#${e.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { threshold: 0.3 });
+
+sections.forEach(s => obs.observe(s));
+</script>
