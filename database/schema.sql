@@ -116,6 +116,7 @@ CREATE TABLE appointments (
     doctor_id   INT UNSIGNED  NOT NULL,
     appt_date   DATE          NOT NULL,
     appt_time   TIME          NOT NULL,
+    fee         DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     status      ENUM('pending','confirmed','completed','cancelled')
                               NOT NULL DEFAULT 'pending',
     reason      TEXT              NULL,

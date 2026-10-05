@@ -90,7 +90,7 @@ class Doctor
     public static function allServices(): array
     {
         return Database::query(
-            "SELECT id, name FROM services WHERE status = 'active' ORDER BY name"
+            "SELECT id, name FROM services WHERE is_active = 1 ORDER BY name"
         );
     }
 

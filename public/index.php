@@ -14,6 +14,8 @@ require_once ROOT_PATH . '/models/User.php';
 require_once ROOT_PATH . '/models/Patient.php';
 require_once ROOT_PATH . '/models/Doctor.php';
 require_once ROOT_PATH . '/models/Appointment.php';
+require_once ROOT_PATH . '/models/Report.php';
+require_once ROOT_PATH . '/models/Message.php';
 
 // ── Controllers ───────────────────────────────────────────
 require_once ROOT_PATH . '/controllers/AuthController.php';
@@ -21,6 +23,8 @@ require_once ROOT_PATH . '/controllers/AppointmentController.php';
 require_once ROOT_PATH . '/controllers/BookingController.php';
 require_once ROOT_PATH . '/controllers/RatingController.php';
 require_once ROOT_PATH . '/controllers/ProfileController.php';
+require_once ROOT_PATH . '/controllers/ReportController.php';
+require_once ROOT_PATH . '/controllers/MessageController.php';
 
 // ── Session ───────────────────────────────────────────────
 Session::start();
@@ -37,6 +41,8 @@ $apptCtrl   = new AppointmentController();
 $booking    = new BookingController();
 $rating     = new RatingController();
 $profile    = new ProfileController();
+$reportCtrl = new ReportController();
+$msgCtrl    = new MessageController();
 
 // ── Dynamic segment helpers ───────────────────────────────
 // Match /doctors/123  → $segments = ['doctors','123']
@@ -55,6 +61,18 @@ try {
         // /appointments/123/rate — rating form
         if (count($segments) === 3 && $segments[0] === 'appointments' && ctype_digit($segments[1]) && $segments[2] === 'rate') {
             $rating->showForm((int)$segments[1]);
+            exit;
+        }
+
+        // /reports/download/:id
+        if (count($segments) === 3 && $segments[0] === 'reports' && $segments[1] === 'download' && ctype_digit($segments[2])) {
+            $reportCtrl->download((int)$segments[2]);
+            exit;
+        }
+
+        // /messages/:id — open a thread
+        if (count($segments) === 2 && $segments[0] === 'messages' && ctype_digit($segments[1])) {
+            $msgCtrl->show((int)$segments[1]);
             exit;
         }
 
@@ -115,20 +133,34 @@ try {
                 $apptCtrl->adminIndex();
                 break;
 
+            case 'reports':
+                $reportCtrl->patientIndex();
+                break;
+
+            case 'messages':
+                $msgCtrl->index();
+                break;
+
+            case 'doctor/reports':
+                $reportCtrl->doctorIndex();
+                break;
+
+            case 'doctor/messages':
+                $msgCtrl->index();
+                break;
+
             case 'admin/doctors':
             case 'admin/users':
             case 'admin/services':
             case 'admin/reports':
             case 'doctor/schedule':
             case 'doctor/patients':
-            case 'reports':
-            case 'messages':
                 Middleware::requireAuth();
                 http_response_code(501);
                 view('errors.404', [
                     'title'   => 'Coming Soon — MediCare Plus',
                     'heading' => 'Coming Soon',
-                    'message' => 'This section is under construction. Check back shortly.',
+                    'message' => 'This section is under construction.',
                 ]);
                 break;
 
@@ -139,6 +171,18 @@ try {
 
     // ── POST ──────────────────────────────────────────────
     } elseif ($method === 'POST') {
+
+        // /reports/delete/:id
+        if (count($segments) === 3 && $segments[0] === 'reports' && $segments[1] === 'delete' && ctype_digit($segments[2])) {
+            $reportCtrl->delete((int)$segments[2]);
+            exit;
+        }
+
+        // /messages/:id/reply
+        if (count($segments) === 3 && $segments[0] === 'messages' && ctype_digit($segments[1]) && $segments[2] === 'reply') {
+            $msgCtrl->reply((int)$segments[1]);
+            exit;
+        }
 
         switch ($route) {
             // ── Auth ──
@@ -161,6 +205,12 @@ try {
 
             // ── Profile ──
             case 'profile/update': $profile->update(); break;
+
+            // ── Reports ──
+            case 'doctor/reports/upload': $reportCtrl->upload(); break;
+
+            // ── Messages ──
+            case 'messages/new': $msgCtrl->newThread(); break;
 
             default:
                 http_response_code(404);

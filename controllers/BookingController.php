@@ -42,9 +42,9 @@ class BookingController
         }
 
         $day = date('l', strtotime($date)); // Monday, Tuesday, …
-        $avail = Database::queryAll(
+        $avail = Database::query(
             "SELECT start_time, end_time FROM doctor_availability
-              WHERE doctor_id = ? AND day_of_week = ? AND is_available = 1",
+              WHERE doctor_id = ? AND day_of_week = ?",
             [$doctorId, $day]
         );
 
@@ -146,17 +146,14 @@ class BookingController
             return;
         }
 
-        // Determine service_id from doctor
-        $serviceId = $doctor['service_id'] ?? null;
-
         // Generate ref number
         $ref = 'MP-' . strtoupper(substr(md5(uniqid('', true)), 0, 8));
 
         Database::execute(
             "INSERT INTO appointments
-               (ref_no, patient_id, doctor_id, service_id, appt_date, appt_time, reason, fee, status)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')",
-            [$ref, $patient['id'], $doctorId, $serviceId, $apptDate, $apptTime, $reason, $doctor['fee']]
+               (ref_no, patient_id, doctor_id, appt_date, appt_time, reason, fee, status)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')",
+            [$ref, $patient['id'], $doctorId, $apptDate, $apptTime, $reason, $doctor['fee']]
         );
 
         $apptId = Database::lastInsertId();

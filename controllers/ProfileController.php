@@ -37,13 +37,14 @@ class ProfileController
         $patient = Patient::findByUserId(Auth::id());
         if ($patient) {
             Database::execute(
-                "UPDATE patients SET dob=?,gender=?,blood_group=?,allergies=?,address=?,ec_name=?,ec_phone=?
-                  WHERE user_id=?",
+                "UPDATE patients SET dob=?,gender=?,blood_group=?,allergies=?,address=?,
+                  emergency_contact_name=?,emergency_contact_phone=? WHERE user_id=?",
                 [$dob,$gender,$blood,$allerg,$addr,$ecName,$ecPhone,Auth::id()]
             );
         } else {
             Database::execute(
-                "INSERT INTO patients (user_id,dob,gender,blood_group,allergies,address,ec_name,ec_phone)
+                "INSERT INTO patients (user_id,dob,gender,blood_group,allergies,address,
+                  emergency_contact_name,emergency_contact_phone)
                  VALUES (?,?,?,?,?,?,?,?)",
                 [Auth::id(),$dob,$gender,$blood,$allerg,$addr,$ecName,$ecPhone]
             );
