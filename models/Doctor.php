@@ -29,8 +29,8 @@ class Doctor
         );
     }
 
-    /** All doctors with their service and average rating. */
-    public static function allWithStats(): array
+    /** All doctors with their service and average rating. Optional limit. */
+    public static function allWithStats(int $limit = 100): array
     {
         return Database::query(
             "SELECT doc.*, u.name, u.email, u.status AS user_status,
@@ -43,8 +43,54 @@ class Doctor
                JOIN services s   ON s.id   = doc.service_id
           LEFT JOIN ratings  r   ON r.doctor_id = doc.id AND r.is_approved = 1
           LEFT JOIN appointments a ON a.doctor_id = doc.id AND a.status = 'completed'
+              WHERE u.status = 'active'
               GROUP BY doc.id
-              ORDER BY doc.is_featured DESC, avg_rating DESC"
+              ORDER BY doc.is_featured DESC, avg_rating DESC
+              LIMIT ?",
+            [$limit]
+        );
+    }
+
+    /** Search doctors by name or specialization, optionally filtered by service name. */
+    public static function search(string $q = '', string $service = ''): array
+    {
+        $params = [];
+        $where  = ["u.status = 'active'"];
+
+        if ($q !== '') {
+            $where[]  = "(u.name LIKE ? OR doc.specialization LIKE ?)";
+            $params[] = "%$q%";
+            $params[] = "%$q%";
+        }
+        if ($service !== '') {
+            $where[]  = "s.name = ?";
+            $params[] = $service;
+        }
+
+        $whereClause = implode(' AND ', $where);
+
+        return Database::query(
+            "SELECT doc.*, u.name, u.email,
+                    s.name AS service_name,
+                    ROUND(AVG(r.stars),1) AS avg_rating,
+                    COUNT(DISTINCT a.id)  AS appt_count
+               FROM doctors doc
+               JOIN users    u ON u.id = doc.user_id
+               JOIN services s ON s.id = doc.service_id
+          LEFT JOIN ratings  r ON r.doctor_id = doc.id AND r.is_approved = 1
+          LEFT JOIN appointments a ON a.doctor_id = doc.id AND a.status = 'completed'
+              WHERE $whereClause
+              GROUP BY doc.id
+              ORDER BY doc.is_featured DESC, avg_rating DESC",
+            $params
+        );
+    }
+
+    /** All active services for filter dropdown. */
+    public static function allServices(): array
+    {
+        return Database::query(
+            "SELECT id, name FROM services WHERE status = 'active' ORDER BY name"
         );
     }
 

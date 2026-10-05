@@ -7,6 +7,7 @@ class Appointment
     private static function baseSelect(): string
     {
         return "SELECT a.*,
+                       p_user.id    AS patient_user_id,
                        p_user.name  AS patient_name,
                        p_user.email AS patient_email,
                        p_user.phone AS patient_phone,

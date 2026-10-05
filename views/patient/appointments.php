@@ -157,10 +157,17 @@ $activeTab = $_GET['tab'] ?? 'upcoming';
                 </button>
               </form>
               <?php elseif ($a['status'] === 'completed'): ?>
-                <button class="btn btn-sm btn-outline-secondary" style="font-size:.78rem"
-                        data-bs-toggle="modal" data-bs-target="#apptDetail<?= $a['id'] ?>">
-                  <i class="bi bi-eye me-1"></i>View
-                </button>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-sm btn-outline-secondary" style="font-size:.78rem"
+                          data-bs-toggle="modal" data-bs-target="#apptDetail<?= $a['id'] ?>">
+                    <i class="bi bi-eye me-1"></i>View
+                  </button>
+                  <a href="<?= url('appointments/'.$a['id'].'/rate') ?>"
+                     class="btn btn-sm btn-outline-warning" style="font-size:.78rem"
+                     title="Rate this appointment">
+                    <i class="bi bi-star"></i>
+                  </a>
+                </div>
               <?php else: ?>
                 <span style="color:var(--mp-text-3);font-size:.8rem">—</span>
               <?php endif; ?>

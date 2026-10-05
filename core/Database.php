@@ -98,6 +98,12 @@ class Database
         return self::getInstance()->lastInsertId();
     }
 
+    /** Return the last auto-increment ID from the current connection. */
+    public static function lastInsertId(): int
+    {
+        return (int)self::getInstance()->lastInsertId();
+    }
+
     /**
      * Execute a callable inside a transaction.
      * If the callable throws, the transaction is rolled back automatically.

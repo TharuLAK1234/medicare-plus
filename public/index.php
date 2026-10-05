@@ -12,94 +12,123 @@ require_once CORE_PATH . '/Validator.php';
 // ── Models ────────────────────────────────────────────────
 require_once ROOT_PATH . '/models/User.php';
 require_once ROOT_PATH . '/models/Patient.php';
+require_once ROOT_PATH . '/models/Doctor.php';
+require_once ROOT_PATH . '/models/Appointment.php';
 
 // ── Controllers ───────────────────────────────────────────
 require_once ROOT_PATH . '/controllers/AuthController.php';
+require_once ROOT_PATH . '/controllers/AppointmentController.php';
+require_once ROOT_PATH . '/controllers/BookingController.php';
+require_once ROOT_PATH . '/controllers/RatingController.php';
+require_once ROOT_PATH . '/controllers/ProfileController.php';
 
 // ── Session ───────────────────────────────────────────────
 Session::start();
 
 // ── Routing ───────────────────────────────────────────────
-$method  = $_SERVER['REQUEST_METHOD'];
+$method   = $_SERVER['REQUEST_METHOD'];
+$basePath = rtrim(parse_url(APP_URL, PHP_URL_PATH), '/');
+$reqPath  = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$route    = rtrim(trim(substr($reqPath, strlen($basePath)), '/'), '/') ?: 'home';
 
-// Strip the APP_URL base path so we work with just the route segment.
-// APP_URL = http://localhost/medicare-plus/public
-$basePath = rtrim(parse_url(APP_URL, PHP_URL_PATH), '/');            // /medicare-plus/public
-$requestPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);     // /medicare-plus/public/login
-$route = trim(substr($requestPath, strlen($basePath)), '/') ?: 'home'; // login
+// Instantiate controllers
+$auth       = new AuthController();
+$apptCtrl   = new AppointmentController();
+$booking    = new BookingController();
+$rating     = new RatingController();
+$profile    = new ProfileController();
 
-// Normalise trailing slashes
-$route = rtrim($route, '/');
+// ── Dynamic segment helpers ───────────────────────────────
+// Match /doctors/123  → $segments = ['doctors','123']
+$segments = explode('/', $route);
 
-$auth = new AuthController();
-
-// ── Route table ───────────────────────────────────────────
 try {
+    // ── GET ───────────────────────────────────────────────
     if ($method === 'GET') {
+
+        // /doctors/123 — doctor profile page
+        if (count($segments) === 2 && $segments[0] === 'doctors' && ctype_digit($segments[1])) {
+            $booking->showProfile((int)$segments[1]);
+            exit;
+        }
+
+        // /appointments/123/rate — rating form
+        if (count($segments) === 3 && $segments[0] === 'appointments' && ctype_digit($segments[1]) && $segments[2] === 'rate') {
+            $rating->showForm((int)$segments[1]);
+            exit;
+        }
+
         switch ($route) {
+            // ── Public ──
             case 'home':
             case '':
                 view('public.home', ['title' => 'MediCare Plus — Quality Healthcare Online']);
                 break;
 
-            // ── Patient portal ──
-            case 'login':
-                $auth->showLogin();
+            case 'doctors':
+                $booking->index();
                 break;
 
-            case 'register':
-                $auth->showRegister();
+            // ── Auth ──
+            case 'login':       $auth->showLogin();       break;
+            case 'register':    $auth->showRegister();    break;
+            case 'doctor/login':$auth->showDoctorLogin(); break;
+            case 'admin/login': $auth->showAdminLogin();  break;
+            case 'logout':      $auth->logout();          break;
+
+            // ── Booking ──
+            case 'booking/slots':
+                $booking->slots();
                 break;
 
-            // ── Doctor portal ──
-            case 'doctor/login':
-                $auth->showDoctorLogin();
-                break;
-
-            // ── Admin portal ──
-            case 'admin/login':
-                $auth->showAdminLogin();
-                break;
-
-            case 'logout':
-                $auth->logout();
-                break;
-
+            // ── Patient ──
             case 'patient/dashboard':
                 Middleware::requireRole('patient');
-                view('patient.dashboard', ['title' => 'Patient Dashboard — MediCare Plus']);
+                view('patient.dashboard', ['title' => 'Dashboard — MediCare Plus']);
                 break;
 
+            case 'appointments':
+                $apptCtrl->patientIndex();
+                break;
+
+            case 'profile':
+                $profile->show();
+                break;
+
+            // ── Doctor ──
             case 'doctor/dashboard':
                 Middleware::requireRole('doctor');
-                view('doctor.dashboard', ['title' => 'Doctor Dashboard — MediCare Plus']);
+                view('doctor.dashboard', ['title' => 'Dashboard — MediCare Plus']);
                 break;
 
+            case 'doctor/appointments':
+                $apptCtrl->doctorIndex();
+                break;
+
+            // ── Admin ──
             case 'admin/dashboard':
                 Middleware::requireRole('admin');
                 view('admin.dashboard', ['title' => 'Admin Dashboard — MediCare Plus']);
                 break;
 
-            // ── Future routes (Phase 5–8) — 404 until built ──
-            case 'services':
-            case 'doctors':
-            case 'appointments':
-            case 'reports':
-            case 'messages':
-            case 'profile':
+            case 'admin/appointments':
+                $apptCtrl->adminIndex();
+                break;
+
             case 'admin/doctors':
             case 'admin/users':
-            case 'admin/appointments':
             case 'admin/services':
             case 'admin/reports':
             case 'doctor/schedule':
             case 'doctor/patients':
+            case 'reports':
+            case 'messages':
                 Middleware::requireAuth();
                 http_response_code(501);
                 view('errors.404', [
                     'title'   => 'Coming Soon — MediCare Plus',
-                    'heading' => '🚧 Coming Soon',
-                    'message' => 'This section is being built. Check back shortly.',
+                    'heading' => 'Coming Soon',
+                    'message' => 'This section is under construction. Check back shortly.',
                 ]);
                 break;
 
@@ -108,23 +137,30 @@ try {
                 view('errors.404', ['title' => '404 — Page Not Found']);
         }
 
+    // ── POST ──────────────────────────────────────────────
     } elseif ($method === 'POST') {
+
         switch ($route) {
-            case 'login':
-                $auth->login();
-                break;
+            // ── Auth ──
+            case 'login':        $auth->login();        break;
+            case 'register':     $auth->register();     break;
+            case 'doctor/login': $auth->doctorLogin();  break;
+            case 'admin/login':  $auth->adminLogin();   break;
 
-            case 'register':
-                $auth->register();
-                break;
+            // ── Booking ──
+            case 'booking/create': $booking->create(); break;
+            case 'booking/store':  $booking->store();  break;
 
-            case 'doctor/login':
-                $auth->doctorLogin();
-                break;
+            // ── Appointment mutations ──
+            case 'appointment/cancel':  $apptCtrl->cancel();  break;
+            case 'appointment/confirm': $apptCtrl->confirm(); break;
+            case 'appointment/complete':$apptCtrl->complete();break;
 
-            case 'admin/login':
-                $auth->adminLogin();
-                break;
+            // ── Ratings ──
+            case 'ratings/store': $rating->store(); break;
+
+            // ── Profile ──
+            case 'profile/update': $profile->update(); break;
 
             default:
                 http_response_code(404);
@@ -132,7 +168,6 @@ try {
         }
 
     } else {
-        // HEAD, OPTIONS, etc.
         http_response_code(405);
         header('Allow: GET, POST');
     }
@@ -144,7 +179,6 @@ try {
         'line'    => $e->getLine(),
         'trace'   => $e->getTraceAsString(),
     ]);
-
     http_response_code(500);
     view('errors.500', ['title' => '500 — Server Error']);
 }
