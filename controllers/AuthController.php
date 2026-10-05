@@ -1,6 +1,46 @@
 <?php
 class AuthController
 {
+    private const MAX_ATTEMPTS  = 5;
+    private const LOCKOUT_SECS  = 900; // 15 minutes
+
+    // ── Rate-limit helpers ────────────────────────────────────────────────
+
+    private function rateLimitKey(string $email): string
+    {
+        return 'rl_' . md5(strtolower(trim($email)) . ($_SERVER['REMOTE_ADDR'] ?? ''));
+    }
+
+    private function checkRateLimit(string $email): ?string
+    {
+        $key  = $this->rateLimitKey($email);
+        $data = $_SESSION[$key] ?? ['count' => 0, 'until' => 0];
+
+        if ($data['until'] > time()) {
+            $mins = ceil(($data['until'] - time()) / 60);
+            return "Too many failed attempts. Please try again in {$mins} minute(s).";
+        }
+        return null;
+    }
+
+    private function recordFailure(string $email): void
+    {
+        $key  = $this->rateLimitKey($email);
+        $data = $_SESSION[$key] ?? ['count' => 0, 'until' => 0];
+
+        $data['count']++;
+        if ($data['count'] >= self::MAX_ATTEMPTS) {
+            $data['until'] = time() + self::LOCKOUT_SECS;
+            $data['count'] = 0;
+        }
+        $_SESSION[$key] = $data;
+    }
+
+    private function clearRateLimit(string $email): void
+    {
+        unset($_SESSION[$this->rateLimitKey($email)]);
+    }
+
     // ── Shared helpers ────────────────────────────────────────────────────
 
     /**
@@ -49,17 +89,27 @@ class AuthController
             return;
         }
 
-        $result = Auth::attempt($_POST['email'] ?? '', $_POST['password'] ?? '', 'patient');
+        $email = $_POST['email'] ?? '';
+
+        if ($lock = $this->checkRateLimit($email)) {
+            view('public.login', ['title' => 'Patient Portal — MediCare Plus',
+                'errors' => ['auth' => $lock], 'old' => ['email' => $email]]);
+            return;
+        }
+
+        $result = Auth::attempt($email, $_POST['password'] ?? '', 'patient');
 
         if ($result !== 'ok') {
+            $this->recordFailure($email);
             view('public.login', [
                 'title'  => 'Patient Portal — MediCare Plus',
                 'errors' => ['auth' => $this->attemptError($result, 'Patient Portal')],
-                'old'    => ['email' => $_POST['email'] ?? ''],
+                'old'    => ['email' => $email],
             ]);
             return;
         }
 
+        $this->clearRateLimit($email);
         Session::flash('success', 'Welcome back, ' . Auth::user()['name'] . '!');
         redirect(url('patient/dashboard'));
     }
@@ -95,17 +145,27 @@ class AuthController
             return;
         }
 
-        $result = Auth::attempt($_POST['email'] ?? '', $_POST['password'] ?? '', 'doctor');
+        $email = $_POST['email'] ?? '';
+
+        if ($lock = $this->checkRateLimit($email)) {
+            view('doctor.login', ['title' => 'Doctor Portal — MediCare Plus',
+                'errors' => ['auth' => $lock], 'old' => ['email' => $email]]);
+            return;
+        }
+
+        $result = Auth::attempt($email, $_POST['password'] ?? '', 'doctor');
 
         if ($result !== 'ok') {
+            $this->recordFailure($email);
             view('doctor.login', [
                 'title'  => 'Doctor Portal — MediCare Plus',
                 'errors' => ['auth' => $this->attemptError($result, 'Doctor Portal')],
-                'old'    => ['email' => $_POST['email'] ?? ''],
+                'old'    => ['email' => $email],
             ]);
             return;
         }
 
+        $this->clearRateLimit($email);
         Session::flash('success', 'Welcome, Dr. ' . explode(' ', Auth::user()['name'])[0] . '!');
         redirect(url('doctor/dashboard'));
     }
@@ -141,17 +201,27 @@ class AuthController
             return;
         }
 
-        $result = Auth::attempt($_POST['email'] ?? '', $_POST['password'] ?? '', 'admin');
+        $email = $_POST['email'] ?? '';
+
+        if ($lock = $this->checkRateLimit($email)) {
+            view('admin.login', ['title' => 'Administration — MediCare Plus',
+                'errors' => ['auth' => $lock], 'old' => ['email' => $email]]);
+            return;
+        }
+
+        $result = Auth::attempt($email, $_POST['password'] ?? '', 'admin');
 
         if ($result !== 'ok') {
+            $this->recordFailure($email);
             view('admin.login', [
                 'title'  => 'Administration — MediCare Plus',
                 'errors' => ['auth' => $this->attemptError($result, 'Admin Portal')],
-                'old'    => ['email' => $_POST['email'] ?? ''],
+                'old'    => ['email' => $email],
             ]);
             return;
         }
 
+        $this->clearRateLimit($email);
         Session::flash('success', 'Signed in as administrator.');
         redirect(url('admin/dashboard'));
     }

@@ -1,26 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>403 — Access Denied | MediCare Plus</title>
-    <style>
-        body { font-family: sans-serif; display: flex; align-items: center;
-               justify-content: center; min-height: 100vh; margin: 0; background: #f1f5f9; }
-        .box { text-align: center; padding: 48px; background: #fff;
-               border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,.08); }
-        h1 { font-size: 5rem; margin: 0; color: #ef4444; }
-        h2 { color: #1e293b; margin: 8px 0 16px; }
-        p  { color: #64748b; }
-        a  { color: #0A6E82; text-decoration: none; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="box">
-        <h1>403</h1>
-        <h2>Access Denied</h2>
-        <p>You do not have permission to view this page.</p>
-        <a href="<?= defined('APP_URL') ? APP_URL : '/' ?>">← Back to Home</a>
+<?php
+$title = $title ?? '403 — Access Denied | MediCare Plus';
+
+require VIEW_PATH . '/layouts/header.php';
+require VIEW_PATH . '/layouts/navbar.php';
+?>
+
+<div style="min-height:calc(100vh - 140px);display:flex;align-items:center;justify-content:center;
+            padding:2rem 1rem">
+  <div style="text-align:center;max-width:480px">
+    <div style="font-size:7rem;font-weight:900;font-family:var(--font-display);
+                color:var(--mp-danger);line-height:1;letter-spacing:-.04em;opacity:.14">
+      403
     </div>
-</body>
-</html>
+    <div style="margin-top:-2rem;margin-bottom:1.25rem">
+      <div style="width:72px;height:72px;border-radius:50%;background:#FEF2F2;
+                  display:flex;align-items:center;justify-content:center;
+                  margin:0 auto 1.25rem">
+        <i class="bi bi-shield-x" style="font-size:2rem;color:var(--mp-danger)"></i>
+      </div>
+      <h1 style="font-size:1.6rem;margin-bottom:.5rem">Access Denied</h1>
+      <p style="color:var(--mp-text-3);font-size:.95rem;margin-bottom:2rem">
+        You do not have permission to view this page.
+        If you believe this is an error, please sign in with the correct account.
+      </p>
+      <div class="d-flex gap-3 justify-content-center flex-wrap">
+        <a href="<?= url('') ?>" class="btn btn-primary px-4">
+          <i class="bi bi-house me-2"></i>Go Home
+        </a>
+        <a href="<?= url('login') ?>" class="btn btn-outline-secondary px-4">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<?php require VIEW_PATH . '/layouts/footer.php'; ?>

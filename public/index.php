@@ -26,6 +26,12 @@ require_once ROOT_PATH . '/controllers/ProfileController.php';
 require_once ROOT_PATH . '/controllers/ReportController.php';
 require_once ROOT_PATH . '/controllers/MessageController.php';
 
+// ── Security headers ──────────────────────────────────────
+header('X-Frame-Options: SAMEORIGIN');
+header('X-Content-Type-Options: nosniff');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+header('X-XSS-Protection: 1; mode=block');
+
 // ── Session ───────────────────────────────────────────────
 Session::start();
 
@@ -84,6 +90,7 @@ try {
                 break;
 
             case 'doctors':
+            case 'services':
                 $booking->index();
                 break;
 

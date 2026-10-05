@@ -443,6 +443,7 @@ a:hover { color: var(--mp-primary-dark); }
   font-size: .75rem;
   font-weight: 600;
   text-transform: capitalize;
+  white-space: nowrap;
 }
 .mp-badge.pending   { background: #FFF3CD; color: #856404; }
 .mp-badge.confirmed { background: #D1ECF1; color: #0C5460; }
@@ -450,10 +451,74 @@ a:hover { color: var(--mp-primary-dark); }
 .mp-badge.cancelled { background: #F8D7DA; color: #721C24; }
 .mp-badge.active    { background: #D4EDDA; color: #155724; }
 .mp-badge.inactive  { background: #F8D7DA; color: #721C24; }
+.mp-badge.teal      { background: var(--mp-primary-light); color: var(--mp-primary); }
+.mp-badge.green     { background: #ECFDF5; color: #065F46; }
+.mp-badge.blue      { background: #EFF6FF; color: #1E40AF; }
+.mp-badge.purple    { background: #F5F3FF; color: #5B21B6; }
+.mp-badge.amber     { background: #FFFBEB; color: #92400E; }
+.mp-badge.red       { background: #FEF2F2; color: #991B1B; }
+.mp-badge.patient   { background: #ECFDF5; color: #065F46; }
+.mp-badge.doctor    { background: #EFF6FF; color: #1E40AF; }
+.mp-badge.admin     { background: #F5F3FF; color: #5B21B6; }
+
+/* ── Standalone stat icon (for use outside mp-stat-card) ──── */
+.stat-icon {
+  border-radius: var(--r-lg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.stat-icon.teal    { background: var(--mp-primary-light); color: var(--mp-primary); }
+.stat-icon.green   { background: #ECFDF5; color: #059669; }
+.stat-icon.amber   { background: #FFFBEB; color: #D97706; }
+.stat-icon.blue    { background: #EFF6FF; color: #2563EB; }
+.stat-icon.red     { background: #FEF2F2; color: #DC2626; }
+.stat-icon.purple  { background: #F5F3FF; color: #7C3AED; }
 
 /* ── Responsive tweaks ────────────────────────────────────── */
+@media (max-width: 991px) {
+  /* Navbar: links stack below toggle, add spacing */
+  .mp-navbar .navbar-nav .nav-link { padding: .5rem .5rem !important; }
+  #mpNav .navbar-nav.align-items-center { margin-top: .75rem; }
+  #mpNav .navbar-nav.align-items-center .nav-item { width: 100%; }
+}
+
 @media (max-width: 768px) {
+  /* Auth layout */
   .mp-auth-left   { display: none; }
   .mp-auth-right  { padding: var(--sp-8) var(--sp-4); }
-  .mp-register-card { padding: var(--sp-8) var(--sp-6); }
+  .mp-register-card { padding: var(--sp-6) var(--sp-4); }
+
+  /* Page shell: tighter vertical padding on mobile */
+  .mp-page-wrap { padding: var(--sp-6) 0 var(--sp-12); }
+
+  /* Cards: less padding on mobile */
+  .mp-card { padding: var(--sp-6); }
+
+  /* Stat cards: wrap on small screens */
+  .mp-stat-card { flex-direction: column; align-items: flex-start; gap: var(--sp-3); }
+  .mp-stat-card .stat-value { font-size: 1.4rem; }
+
+  /* Section headings */
+  h1 { font-size: 1.3rem !important; }
+
+  /* Message pane: stack columns */
+  .col-lg-4, .col-lg-8 { min-width: 100%; }
+
+  /* Tables: scroll horizontally */
+  .table-responsive { -webkit-overflow-scrolling: touch; }
+}
+
+@media (max-width: 480px) {
+  /* Register card: minimal padding */
+  .mp-register-card { padding: var(--sp-4); border-radius: var(--r-lg); }
+
+  /* Auth box */
+  .mp-auth-box .auth-heading { font-size: 1.4rem; }
+
+  /* Buttons in groups: stack */
+  .d-flex.gap-2.flex-wrap, .d-flex.gap-3.flex-wrap {
+    flex-direction: column;
+  }
 }

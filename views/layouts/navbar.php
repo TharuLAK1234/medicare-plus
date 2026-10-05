@@ -2,6 +2,11 @@
 $currentUser = Auth::user();
 $role = $currentUser['role'] ?? 'guest';
 
+$unreadCount = 0;
+if ($currentUser && in_array($role, ['patient', 'doctor'])) {
+    try { $unreadCount = Message::unreadCount((int)$currentUser['id']); } catch (Throwable) {}
+}
+
 // Determine the active route segment for highlighting
 $uri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
 $seg = explode('/', str_replace(
@@ -34,8 +39,8 @@ $seg = explode('/', str_replace(
              href="<?= url('') ?>">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link <?= $seg === 'services' ? 'active' : '' ?>"
-             href="<?= url('services') ?>">Services</a>
+          <a class="nav-link <?= $seg === 'doctors' ? 'active' : '' ?>"
+             href="<?= url('doctors') ?>">Services</a>
         </li>
         <li class="nav-item">
           <a class="nav-link <?= $seg === 'doctors' ? 'active' : '' ?>"
@@ -47,16 +52,38 @@ $seg = explode('/', str_replace(
             <a class="nav-link <?= $seg === 'appointments' ? 'active' : '' ?>"
                href="<?= url('appointments') ?>">My Appointments</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link <?= $seg === 'messages' ? 'active' : '' ?>"
+               href="<?= url('messages') ?>" style="position:relative">
+              Messages
+              <?php if ($unreadCount > 0): ?>
+              <span style="position:absolute;top:2px;right:0;background:var(--mp-danger);
+                           color:#fff;border-radius:9999px;font-size:.6rem;font-weight:700;
+                           padding:.1rem .35rem;line-height:1.2">
+                <?= $unreadCount > 9 ? '9+' : $unreadCount ?>
+              </span>
+              <?php endif; ?>
+            </a>
+          </li>
         <?php endif; ?>
 
         <?php if ($role === 'doctor'): ?>
           <li class="nav-item">
             <a class="nav-link <?= $seg === 'appointments' ? 'active' : '' ?>"
-               href="<?= url('appointments') ?>">Appointments</a>
+               href="<?= url('doctor/appointments') ?>">Appointments</a>
           </li>
           <li class="nav-item">
             <a class="nav-link <?= $seg === 'messages' ? 'active' : '' ?>"
-               href="<?= url('messages') ?>">Messages</a>
+               href="<?= url('doctor/messages') ?>" style="position:relative">
+              Messages
+              <?php if ($unreadCount > 0): ?>
+              <span style="position:absolute;top:2px;right:0;background:var(--mp-danger);
+                           color:#fff;border-radius:9999px;font-size:.6rem;font-weight:700;
+                           padding:.1rem .35rem;line-height:1.2">
+                <?= $unreadCount > 9 ? '9+' : $unreadCount ?>
+              </span>
+              <?php endif; ?>
+            </a>
           </li>
         <?php endif; ?>
 
@@ -153,10 +180,12 @@ $seg = explode('/', str_replace(
               <?php elseif ($role === 'doctor'): ?>
                 <li><a class="dropdown-item" href="<?= url('doctor/dashboard') ?>">
                   <i class="bi bi-speedometer2"></i> Dashboard</a></li>
-                <li><a class="dropdown-item" href="<?= url('doctor/schedule') ?>">
-                  <i class="bi bi-calendar3"></i> My Schedule</a></li>
-                <li><a class="dropdown-item" href="<?= url('doctor/patients') ?>">
-                  <i class="bi bi-people"></i> My Patients</a></li>
+                <li><a class="dropdown-item" href="<?= url('doctor/appointments') ?>">
+                  <i class="bi bi-calendar2-check"></i> My Appointments</a></li>
+                <li><a class="dropdown-item" href="<?= url('doctor/reports') ?>">
+                  <i class="bi bi-file-earmark-medical"></i> Patient Reports</a></li>
+                <li><a class="dropdown-item" href="<?= url('doctor/messages') ?>">
+                  <i class="bi bi-chat-dots"></i> Messages</a></li>
 
               <?php elseif ($role === 'admin'): ?>
                 <li><a class="dropdown-item" href="<?= url('admin/dashboard') ?>">

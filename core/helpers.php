@@ -56,16 +56,26 @@ function generateRefNo(): string
     return sprintf('MP-%s-%05d', date('Y'), random_int(1, 99999));
 }
 
-/** Format a Y-m-d date string for display. */
-function formatDate(string $date, string $fmt = 'd M Y'): string
+/** Format a Y-m-d date string for display. Returns '—' for null/empty. */
+function formatDate(?string $date, string $fmt = 'd M Y'): string
 {
-    return (new DateTime($date))->format($fmt);
+    if (!$date) return '—';
+    try {
+        return (new DateTime($date))->format($fmt);
+    } catch (Throwable) {
+        return '—';
+    }
 }
 
 /** Format H:i:s time string as 12-hour e.g. 10:00 AM. */
-function formatTime(string $time): string
+function formatTime(?string $time): string
 {
-    return (new DateTime("1970-01-01 {$time}"))->format('h:i A');
+    if (!$time) return '—';
+    try {
+        return (new DateTime("1970-01-01 {$time}"))->format('h:i A');
+    } catch (Throwable) {
+        return '—';
+    }
 }
 
 /** Human-readable file size: 2097152 → "2.0 MB". */
